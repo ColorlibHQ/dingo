@@ -781,7 +781,7 @@ function dingo_food_section( $excerpt_length, $food_items ){
 				$i = 1;
 				foreach ( $categories as $category ) {
 					$active_class = ( $i == 1 ) ? 'active' : '';
-					echo '<a class="'. $active_class .'" id="'. esc_attr( $category->slug ) .'-tab" data-toggle="tab" href="#'. esc_attr( $category->slug ) .'" role="tab" aria-controls="'. esc_attr( $category->slug ) .'" aria-selected="false">'. esc_html( $category->name ) .'</a>';
+					echo '<a class="'. $active_class .'" id="'. esc_attr( $category->slug ) .'-tab" data-bs-toggle="tab" href="#'. esc_attr( $category->slug ) .'" role="tab" aria-controls="'. esc_attr( $category->slug ) .'" aria-selected="false">'. esc_html( $category->name ) .'</a>';
 					$i++;
 				}
 			?>

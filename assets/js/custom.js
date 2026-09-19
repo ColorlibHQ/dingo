@@ -1,147 +1,156 @@
-(function ($) {
-  "use strict";
+/**
+ * Dingo's front-end behaviour.
+ *
+ * Replaces the jQuery version: Owl Carousel, Slick, Magnific Popup and
+ * Nice Select are gone, and the shared ColorlibUI module provides the same
+ * behaviour against the same markup.
+ */
+(function () {
+  'use strict';
 
-  var review = $('.player_info_item');
-  if (review.length) {
-    review.owlCarousel({
-      items: 1,
-      loop: true,
-      dots: false,
-      autoplay: true,
-      margin: 40,
-      autoplayHoverPause: true,
-      autoplayTimeout: 5000,
-      nav: true,
-      navText: [
-        '<img src="img/icon/left.svg" alt="">',
-        '<img src="img/icon/right.svg" alt="">'
+  var UI = window.ColorlibUI;
+  if (!UI) return;
 
-      ],
-      responsive: {
-        0: {
-          margin: 15,
-        },
-        600: {
-          margin: 10,
-        },
-        1000: {
-          margin: 10,
-        }
-      }
-    });
-  }
-  $('.popup-youtube, .popup-vimeo').magnificPopup({
-    // disableOn: 700,
-    type: 'iframe',
-    mainClass: 'mfp-fade',
-    removalDelay: 160,
-    preloader: false,
-    fixedContentPos: false
-  });
+  var lightbox = UI.Lightbox();
 
-  if (document.getElementById('default-select')) {
-    $('select').niceSelect();
-  }
-
-
-  var review = $('.client_review_part');
-  if (review.length) {
-    review.owlCarousel({
-      items: 1,
-      loop: true,
-      dots: true,
-      autoplay: true,
-      autoplayHoverPause: true,
-      autoplayTimeout: 5000,
-      nav: false,
-    });
-  }
-  // menu fixed js code
-  $(window).scroll(function () {
-    var window_top = $(window).scrollTop() + 1;
-    if (window_top > 50) {
-      $('.main_menu').addClass('menu_fixed animated fadeInDown');
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
     } else {
-      $('.main_menu').removeClass('menu_fixed animated fadeInDown');
+      fn();
     }
-  });
-
-  $('.slider').slick({
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: false,
-    speed: 300,
-    infinite: true,
-    asNavFor: '.slider-nav-thumbnails',
-    // autoplay:true,
-    pauseOnFocus: true,
-    dots: true,
-  });
- 
-  $('.slider-nav-thumbnails').slick({
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    asNavFor: '.slider',
-    focusOnSelect: true,
-    infinite: true,
-    prevArrow: false,
-    nextArrow: false,
-    centerMode: true,
-    responsive: [
-      {
-        breakpoint: 480,
-        settings: {
-          centerMode: false,
-        }
-      }
-    ]
-  });
- 
-  //remove active class from all thumbnail slides
-  $('.slider-nav-thumbnails .slick-slide').removeClass('slick-active');
- 
-  //set active class to first thumbnail slides
-  $('.slider-nav-thumbnails .slick-slide').eq(0).addClass('slick-active');
- 
-  // On before slide change match active thumbnail to current slide
-  $('.slider').on('beforeChange', function (event, slick, currentSlide, nextSlide) {
-    var mySlideNumber = nextSlide;
-    $('.slider-nav-thumbnails .slick-slide').removeClass('slick-active');
-    $('.slider-nav-thumbnails .slick-slide').eq(mySlideNumber).addClass('slick-active');
- });
- 
- //UPDATED 
-   
- $('.slider').on('afterChange', function(event, slick, currentSlide){   
-   $('.content').hide();
-   $('.content[data-id=' + (currentSlide + 1) + ']').show();
- }); 
-
- $('.gallery_img').magnificPopup({
-  type: 'image',
-  gallery:{
-    enabled:true
   }
-});
 
- /*-------------------------------------
-     Instagram Photos
-     -------------------------------------*/
-     function cp_instagram_photos() {
-      $('.cp-instagram-photos').each(function(){
-          $.instagramFeed({
-              'username': $(this).data('username'),
-              'container': $(this),
-              'display_profile': false,
-              'display_biography': false,
-              'items': $(this).data('items'),
-              'margin': 0
-          });
-          console.log( $(this) );
+  /**
+   * The two single-item carousels: the player strip and the review slider.
+   */
+  function initCarousels() {
+    var players = document.querySelector('.player_info_item');
+    if (players) {
+      UI.Carousel(players, {
+        perView: 1,
+        loop: true,
+        autoplay: 5000,
+        arrows: true,
+        gap: window.innerWidth >= 600 ? 10 : 15
       });
+    }
 
+    var reviews = document.querySelector('.client_review_part');
+    if (reviews) {
+      UI.Carousel(reviews, { perView: 1, loop: true, autoplay: 5000, dots: true });
+    }
   }
-  cp_instagram_photos();
 
+  /**
+   * The gallery slider and its thumbnail strip.
+   *
+   * The thumbnails drive the main slider and follow it, and the captions
+   * keyed by data-id are swapped to match — the behaviour Slick's asNavFor
+   * and afterChange provided.
+   */
+  function initGallerySlider() {
+    var main = document.querySelector('.slider');
+    var thumbs = document.querySelector('.slider-nav-thumbnails');
+    if (!main) return;
 
-}(jQuery));
+    var mainCarousel = UI.Carousel(main, { perView: 1, loop: true, dots: true });
+    var thumbCarousel = thumbs
+      ? UI.Carousel(thumbs, { perView: { 0: 1, 480: 3 }, loop: true, gap: 10 })
+      : null;
+
+    function showCaption(index) {
+      var captions = document.querySelectorAll('.content');
+      if (captions.length === 0) return;
+      Array.prototype.forEach.call(captions, function (el) {
+        el.hidden = el.dataset.id !== String(index + 1);
+      });
+    }
+
+    function markThumb(index) {
+      if (!thumbs) return;
+      Array.prototype.forEach.call(thumbs.querySelectorAll('.cl-carousel__slide'), function (slide, i) {
+        slide.classList.toggle('slick-active', i === index);
+      });
+    }
+
+    main.addEventListener('cl:change', function (e) {
+      markThumb(e.detail.index);
+      showCaption(e.detail.index);
+      if (thumbCarousel) thumbCarousel.go(e.detail.index, true);
+    });
+
+    if (thumbs) {
+      Array.prototype.forEach.call(thumbs.querySelectorAll('.cl-carousel__slide'), function (slide, i) {
+        slide.addEventListener('click', function () { mainCarousel.go(i); });
+      });
+    }
+
+    markThumb(0);
+    showCaption(0);
+  }
+
+  /**
+   * Images and video embeds, opened in the theme's own lightbox.
+   */
+  function initLightbox() {
+    var videos = document.querySelectorAll('.popup-youtube, .popup-vimeo');
+    Array.prototype.forEach.call(videos, function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        lightbox.open([{ type: 'iframe', src: UI.videoSource(link.href), title: link.title }], 0);
+      });
+    });
+
+    var gallery = document.querySelectorAll('.gallery_img');
+    if (gallery.length === 0) return;
+
+    var items = Array.prototype.map.call(gallery, function (link) {
+      return {
+        type: 'image',
+        src: link.getAttribute('href') || link.dataset.src,
+        title: link.title || (link.querySelector('img') || {}).alt
+      };
+    });
+
+    Array.prototype.forEach.call(gallery, function (link, i) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        lightbox.open(items, i);
+      });
+    });
+  }
+
+  /**
+   * The header pins itself once the page has scrolled past it.
+   */
+  function initStickyMenu() {
+    var menu = document.querySelector('.main_menu');
+    if (!menu) return;
+
+    var pinned = false;
+    function onScroll() {
+      var should = window.pageYOffset > 50;
+      if (should === pinned) return;
+      pinned = should;
+      menu.classList.toggle('menu_fixed', should);
+      menu.classList.toggle('animated', should);
+      menu.classList.toggle('fadeInDown', should);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  function initSelects() {
+    Array.prototype.forEach.call(document.querySelectorAll('select'), UI.enhanceSelect);
+  }
+
+  ready(function () {
+    initCarousels();
+    initGallerySlider();
+    initLightbox();
+    initStickyMenu();
+    initSelects();
+  });
+}());

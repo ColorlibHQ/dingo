@@ -1,0 +1,151 @@
+/*
+ * Styling for the theme's own carousel and lightbox.
+ *
+ * Deliberately minimal: the themes style their own slides, dots and arrows,
+ * so this only provides the structure those plugins used to add — a clipped
+ * viewport with a sliding track, and a full-screen overlay.
+ */
+
+/* Carousel ------------------------------------------------------------ */
+
+.cl-carousel {
+  position: relative;
+}
+
+.cl-carousel__viewport {
+  overflow: hidden;
+}
+
+.cl-carousel__track {
+  display: flex;
+  will-change: transform;
+}
+
+.cl-carousel__slide {
+  flex: 0 0 100%;
+  max-width: 100%;
+  /* A slide must not shrink below its share of the track. */
+  min-width: 0;
+}
+
+.cl-carousel__slide:last-child {
+  margin-right: 0 !important;
+}
+
+.cl-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.cl-carousel__dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .3;
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+
+.cl-carousel__dot.is-active {
+  opacity: 1;
+}
+
+.cl-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .85);
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cl-carousel__arrow--prev { left: 8px; }
+.cl-carousel__arrow--next { right: 8px; }
+
+/* Lightbox ------------------------------------------------------------ */
+
+.cl-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, .9);
+}
+
+.cl-lightbox__stage {
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+}
+
+.cl-lightbox__stage img {
+  max-width: 90vw;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.cl-lightbox__stage iframe {
+  width: min(90vw, 1120px);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+}
+
+.cl-lightbox__close,
+.cl-lightbox__nav {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cl-lightbox__close {
+  top: 16px;
+  right: 20px;
+  font-size: 38px;
+}
+
+.cl-lightbox__nav {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 48px;
+  padding: 8px 16px;
+}
+
+.cl-lightbox__nav--prev { left: 8px; }
+.cl-lightbox__nav--next { right: 8px; }
+
+.cl-lightbox__count {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 13px;
+}
+
+@media (max-width: 575px) {
+  .cl-lightbox__nav { font-size: 32px; padding: 4px 8px; }
+  .cl-lightbox__close { font-size: 30px; }
+}

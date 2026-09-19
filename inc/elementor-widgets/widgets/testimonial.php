@@ -164,7 +164,7 @@ class Dingo_Testimonial extends Widget_Base {
             </div>
             <div class="row">
                 <div class="col-lg-11">
-                    <div class="client_review_part owl-carousel">
+                    <div class="client_review_part">
                         <?php
                         if( is_array( $reviews ) && count( $reviews ) > 0 ){
                             foreach ($reviews as $review ) {

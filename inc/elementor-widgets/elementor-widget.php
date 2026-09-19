@@ -283,29 +283,25 @@ if ( !class_exists( 'Dingo_El_Widgets' ) ) {
             /******************
                 Enqueue Css
             ******************/
-            wp_enqueue_style( 'owl-carousel', DINGO_DIR_ELEMENTOR . 'assets/css/owl.carousel.css', array(), '2.2.0', 'all' );
-            wp_enqueue_style( 'magnific-popup', DINGO_DIR_ELEMENTOR . 'assets/css/magnific-popup.css',  array(), '3.7.0', 'all' );
-
-
             /*****************
                 Enqueue Js
             ******************/
 
             // googleapis js
-            wp_register_script( 'maps-googleapis', '//maps.googleapis.com/maps/api/js?key='.esc_attr( $apiKey ) );
+            wp_register_script( 'dingo-maps-googleapis', '//maps.googleapis.com/maps/api/js?key='.esc_attr( $apiKey ) );
 
             // ajaxchimp js
-            wp_enqueue_script( 'jquery-ajaxchimp', DINGO_DIR_ELEMENTOR . 'assets/js/jquery.ajaxchimp.min.js', array('jquery'), '1.0', true );
+            wp_enqueue_script( 'dingo-ajaxchimp', DINGO_DIR_ELEMENTOR . 'assets/js/jquery.ajaxchimp.min.js', array('jquery'), '1.0', true );
 
 
             // dingo map custom js
             wp_register_script( 'dingo-map-custom', DINGO_DIR_ELEMENTOR . 'assets/js/map-custom.js', array('jquery'), '1.0', true );
 
             // dingo companion main js
-            wp_enqueue_script( 'dingo', DINGO_DIR_ELEMENTOR . 'assets/js/dingo-companion-main.js', array( 'jquery', 'jquery-ui-datepicker' ), '1.0', true );
+            wp_enqueue_script( 'dingo-companion', DINGO_DIR_ELEMENTOR . 'assets/js/dingo-companion-main.js', array( 'jquery', 'jquery-ui-datepicker' ), '1.0', true );
 
 
-            wp_localize_script( 'dingo', 'ajax_object',
+            wp_localize_script( 'dingo-companion', 'ajax_object',
             array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );
            
         }

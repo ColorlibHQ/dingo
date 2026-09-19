@@ -52,7 +52,7 @@ class Dingo_newsletter_widget extends WP_Widget {
             <form target="_blank" action="<?php echo esc_url( $actionurl ); ?>" method="post" class="form-inline">
 
                 <input class="form-control" name="EMAIL" placeholder="<?php esc_html_e( 'Your Email Address', 'dingo' ); ?>" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Email Address '" required="" type="email">
-                <button class="click-btn btn btn-default text-uppercase btn_2"><i class="fa fa-paper-plane"></i></button>
+                <button class="click-btn btn btn-default text-uppercase btn_2"><i class="fa-solid fa-paper-plane"></i></button>
                 <div style="position: absolute; left: -5000px;">
                     <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value="" type="text">
                 </div>
