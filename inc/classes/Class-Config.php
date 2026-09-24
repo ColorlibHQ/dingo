@@ -216,15 +216,15 @@
 					array(
 						'handler'		=> 'dingo-bootstrap',
 						'file' 			=> $jsPath.'bootstrap.min.js',
-						'dependency' 	=> array( 'jquery' ),
+						'dependency' 	=> array(),
 						'version' 		=> '5.3.8-4',
 						'in_footer' 	=> true
 					),
 					array(
 						'handler'		=> 'dingo-ui-js',
-						'file' 			=> $jsPath.'colorlib-ui.js',
-						'dependency' 	=> array( 'jquery' ),
-						'version' 		=> '2.1.1',
+						'file' 			=> $jsPath . ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'colorlib-ui.js' : 'colorlib-ui.min.js' ),
+						'dependency' 	=> array(),
+						'version' 		=> '3.0.0',
 						'in_footer' 	=> true
 					),
 					

@@ -290,15 +290,13 @@ if ( !class_exists( 'Dingo_El_Widgets' ) ) {
             // googleapis js
             wp_register_script( 'dingo-maps-googleapis', '//maps.googleapis.com/maps/api/js?key='.esc_attr( $apiKey ) );
 
-            // ajaxchimp js
-            wp_enqueue_script( 'dingo-ajaxchimp', DINGO_DIR_ELEMENTOR . 'assets/js/jquery.ajaxchimp.min.js', array('jquery'), '1.0', true );
 
 
             // dingo map custom js
-            wp_register_script( 'dingo-map-custom', DINGO_DIR_ELEMENTOR . 'assets/js/map-custom.js', array('jquery'), '1.0', true );
+            wp_register_script( 'dingo-map-custom', DINGO_DIR_ELEMENTOR . 'assets/js/map-custom.js', array(), '1.0-s2', true );
 
             // dingo companion main js
-            wp_enqueue_script( 'dingo-companion', DINGO_DIR_ELEMENTOR . 'assets/js/dingo-companion-main.js', array( 'jquery', 'jquery-ui-datepicker' ), '1.0', true );
+            wp_enqueue_script( 'dingo-companion', DINGO_DIR_ELEMENTOR . 'assets/js/dingo-companion-main.js', array( 'dingo-ui-js' ), '1.0-s2', true );
 
 
             wp_localize_script( 'dingo-companion', 'ajax_object',
