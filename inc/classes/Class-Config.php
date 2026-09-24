@@ -224,7 +224,7 @@
 						'handler'		=> 'dingo-ui-js',
 						'file' 			=> $jsPath.'colorlib-ui.js',
 						'dependency' 	=> array( 'jquery' ),
-						'version' 		=> '2.0.0',
+						'version' 		=> '2.1.1',
 						'in_footer' 	=> true
 					),
 					

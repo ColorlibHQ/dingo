@@ -1,11 +1,13 @@
 /**
  * The interactive pieces these themes actually use, without jQuery.
  *
- * It replaces Owl Carousel, Slick, Magnific Popup and jQuery Nice Select,
- * which together weigh about 28KB gzipped before jQuery itself is counted.
+ * It replaces Owl Carousel, Slick, Magnific Popup, jQuery Nice Select,
+ * CounterUp with the Waypoints library it needed, and WOW.js, which together
+ * weigh about 40KB gzipped before jQuery itself is counted.
  * Those libraries are general-purpose; the themes use a narrow slice of them:
  * a looping carousel, a slider with a thumbnail strip, a lightbox for images
- * and video embeds, and a styled select.
+ * and video embeds, a styled select, numbers that count up and elements that
+ * animate in as they scroll into view.
  *
  * Markup is read from the same class names and data attributes the old
  * plugins used, so templates do not change.
@@ -309,7 +311,10 @@
       li.setAttribute('role', 'option');
       li.setAttribute('aria-selected', option.selected ? 'true' : 'false');
 
-      li.addEventListener('click', function () {
+      li.addEventListener('click', function (e) {
+        // The wrapper toggles on click; without this the choice would bubble
+        // up and reopen the list it just closed.
+        e.stopPropagation();
         if (option.disabled) return;
         select.value = option.value;
         select.dispatchEvent(new Event('change', { bubbles: true }));
@@ -360,10 +365,135 @@
     sync();
   }
 
+  /* ------------------------------------------------------------------ *
+   * Running when the page is ready
+   *
+   * Callers are theme scripts in the footer and inline scripts printed by
+   * widgets in the middle of the page; both are safe.
+   * ------------------------------------------------------------------ */
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+
+  function each(selector, fn) {
+    ready(function () {
+      Array.prototype.forEach.call(document.querySelectorAll(selector), fn);
+    });
+  }
+
+  /** $('select').niceSelect(), without jQuery. */
+  function enhanceSelects(selector) {
+    each(selector || 'select', function (select) {
+      // Nice Select never handled multiple selects, and neither does this.
+      if (select.multiple) return;
+      enhanceSelect(select);
+    });
+  }
+
+
+  /* ------------------------------------------------------------------ *
+   * Counter
+   *
+   * Replaces jQuery CounterUp and the Waypoints library it depended on.
+   * Like CounterUp, the number is read from the element's own text and left
+   * untouched until the element scrolls into view; it then counts up from
+   * zero and always finishes on the original text. Text that is not a plain
+   * number ("24/7") is left alone.
+   * ------------------------------------------------------------------ */
+
+  function counter(selector, options) {
+    var time = (options && options.time) || 1000;
+
+    each(selector, function (el) {
+      if (el.dataset.clCounter) return;
+      el.dataset.clCounter = '1';
+
+      var text = el.textContent.trim();
+      var plain = text.replace(/,/g, '');
+      if (!/^\d+(\.\d+)?$/.test(plain)) return;
+      if (PREFERS_REDUCED || !('IntersectionObserver' in window)) return;
+
+      var target = parseFloat(plain);
+      var decimals = (plain.split('.')[1] || '').length;
+      var commas = /\d,\d/.test(text);
+
+      function format(n) {
+        var s = n.toFixed(decimals);
+        return commas ? s.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : s;
+      }
+
+      var observer = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        observer.disconnect();
+
+        var start = null;
+        function step(now) {
+          if (start === null) start = now;
+          var progress = Math.min((now - start) / time, 1);
+          el.textContent = progress < 1 ? format(target * progress) : text;
+          if (progress < 1) window.requestAnimationFrame(step);
+        }
+        window.requestAnimationFrame(step);
+      });
+      observer.observe(el);
+    });
+  }
+
+
+  /* ------------------------------------------------------------------ *
+   * Reveal on scroll
+   *
+   * Replaces WOW.js, against the same markup: an element with class "wow"
+   * and an animate.css animation class, plus optional data-wow-duration,
+   * data-wow-delay and data-wow-iteration. It is hidden until it scrolls
+   * into view, then gets the "animated" class.
+   *
+   * The animation name is held at "none" until then, as WOW did: otherwise
+   * the animation has already run (at zero duration) by the time "animated"
+   * gives it a real one, and nothing moves. With reduced motion requested,
+   * or no IntersectionObserver, elements are simply left visible.
+   * ------------------------------------------------------------------ */
+
+  function reveal(selector, options) {
+    var offset = (options && options.offset) || 0;
+    if (PREFERS_REDUCED || !('IntersectionObserver' in window)) return;
+
+    each(selector || '.wow', function (el) {
+      if (el.dataset.clReveal) return;
+      el.dataset.clReveal = '1';
+
+      el.style.visibility = 'hidden';
+      el.style.animationName = 'none';
+
+      var observer = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        observer.disconnect();
+
+        var data = el.dataset;
+        if (data.wowDuration) el.style.animationDuration = data.wowDuration;
+        if (data.wowDelay) el.style.animationDelay = data.wowDelay;
+        if (data.wowIteration) el.style.animationIterationCount = data.wowIteration;
+        el.style.animationName = '';
+        el.style.visibility = 'visible';
+        el.classList.add('animated');
+      }, { rootMargin: '0px 0px ' + (-offset) + 'px 0px' });
+      observer.observe(el);
+    });
+  }
+
   window.ColorlibUI = {
     Carousel: Carousel,
     Lightbox: Lightbox,
     enhanceSelect: enhanceSelect,
+    enhanceSelects: enhanceSelects,
+    counter: counter,
+    reveal: reveal,
+    ready: ready,
     videoSource: videoSource,
     debounce: debounce
   };
