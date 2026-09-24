@@ -60,7 +60,7 @@
       : null;
 
     function showCaption(index) {
-      var captions = document.querySelectorAll('.content');
+      var captions = document.querySelectorAll('.content[data-id]');
       if (captions.length === 0) return;
       Array.prototype.forEach.call(captions, function (el) {
         el.hidden = el.dataset.id !== String(index + 1);

@@ -232,7 +232,7 @@
 						'handler'		=> 'dingo-custom',
 						'file' 			=> $jsPath.'custom.js',
 						'dependency' 	=> array( 'dingo-ui-js' ),
-						'version' 		=> $this->dingo_version,
+						'version' 		=> $this->dingo_version . '-s3',
 						'in_footer' 	=> true
 					),
 
